@@ -46,7 +46,7 @@ export function constrainedEditor(monaco) {
       manipulator._editorInstance = editorInstance;
       manipulator._editorInstance._isInDevMode = false;
       domNode.addEventListener('keydown', manipulator._listener, true);
-      editorInstance.onDidChangeModel(function () {
+      manipulator._onChangeModelDisposable = editorInstance.onDidChangeModel(function () {
         // domNode - refers old dom node
         domNode && domNode.removeEventListener('keydown', manipulator._listener, true)
         const newDomNode = editorInstance.getDomNode(); // Gets Current dom node
@@ -129,10 +129,12 @@ export function constrainedEditor(monaco) {
       const instance = manipulator._editorInstance;
       const domNode = instance.getDomNode();
       domNode && domNode.removeEventListener('keydown', manipulator._listener);
+      manipulator._onChangeModelDisposable && manipulator._onChangeModelDisposable.dispose()
       delete manipulator._listener;
       delete manipulator._editorInstance._isInDevMode;
       delete manipulator._editorInstance._devModeAction;
       delete manipulator._editorInstance;
+      delete manipulator._onChangeModelDisposable
       for (let key in _uriRestrictionMap) {
         delete _uriRestrictionMap[key];
       }
